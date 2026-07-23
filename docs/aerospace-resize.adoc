@@ -33,6 +33,13 @@ Second argument controls how much the size changes
 * If the `<number>` is prefixed with `-` then the dimension is decreased
 * If the `<number>` is prefixed with neither `+` nor `-` then the command changes the absolute value of the dimension
 
+=== Floating windows
+
+`resize` also works on floating windows. Since a floating window has no tiling parent to derive an
+orientation from, `smart` is treated as `width` and `smart-opposite` is treated as `height`.
+The window grows/shrinks around its current center and is clamped to stay fully visible on whichever
+monitor it's currently displayed on. See also: xref:aerospace-center-floating-window.adoc[`center-floating-window`].
+
 // =========================================================== Options
 include::./util/conditional-options-header.adoc[]
 

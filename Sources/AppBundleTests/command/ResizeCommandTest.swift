@@ -163,4 +163,84 @@ final class ResizeCommandTest: XCTestCase {
         let result = await parseCommand("resize width +2").cmdOrDie.run(.defaultEnv, .emptyStdin)
         assertEquals(result.exitCode.rawValue, 2)
     }
+
+    // MARK: - Floating windows
+
+    func testFloating_widthAdd_growsAroundCenter() async {
+        var window: Window!
+        Workspace.get(byName: name).floatingWindowsContainer.apply {
+            window = TestWindow.new(id: 1, parent: $0, rect: Rect(topLeftX: 100, topLeftY: 100, width: 200, height: 150))
+        }
+        _ = window.focusWindow()
+
+        let result = await parseCommand("resize width +100").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        assertEquals(result.exitCode.rawValue, 0)
+        // Center (200, 175) stays fixed: new width 300 => topLeftX = 200 - 150 = 50
+        let rect = try! await window.getAxRect(.nonCancellable)!
+        assertEquals(rect, Rect(topLeftX: 50, topLeftY: 100, width: 300, height: 150))
+    }
+
+    func testFloating_heightSet_isAbsoluteNotDelta() async {
+        var window: Window!
+        Workspace.get(byName: name).floatingWindowsContainer.apply {
+            window = TestWindow.new(id: 1, parent: $0, rect: Rect(topLeftX: 100, topLeftY: 100, width: 200, height: 150))
+        }
+        _ = window.focusWindow()
+
+        await parseCommand("resize height 500").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        // Center (200, 175) stays fixed: new height 500 => topLeftY = 175 - 250, clamped to monitor's top (0)
+        let rect = try! await window.getAxRect(.nonCancellable)!
+        assertEquals(rect, Rect(topLeftX: 100, topLeftY: 0, width: 200, height: 500))
+    }
+
+    func testFloating_smartAndSmartOpposite_mapToWidthAndHeight() async {
+        var window: Window!
+        Workspace.get(byName: name).floatingWindowsContainer.apply {
+            window = TestWindow.new(id: 1, parent: $0, rect: Rect(topLeftX: 100, topLeftY: 100, width: 200, height: 150))
+        }
+        _ = window.focusWindow()
+
+        await parseCommand("resize smart +50").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        var rect = try! await window.getAxRect(.nonCancellable)!
+        assertEquals(rect.width, 250) // smart -> width
+        assertEquals(rect.height, 150)
+
+        await parseCommand("resize smart-opposite +50").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        rect = try! await window.getAxRect(.nonCancellable)!
+        assertEquals(rect.width, 250)
+        assertEquals(rect.height, 200) // smart-opposite -> height
+    }
+
+    func testFloating_subtractPastZero_clampsToMinimumSize() async {
+        var window: Window!
+        Workspace.get(byName: name).floatingWindowsContainer.apply {
+            window = TestWindow.new(id: 1, parent: $0, rect: Rect(topLeftX: 100, topLeftY: 100, width: 200, height: 150))
+        }
+        _ = window.focusWindow()
+
+        await parseCommand("resize width -1000").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        let rect = try! await window.getAxRect(.nonCancellable)!
+        assertEquals(rect.width, 1)
+    }
+
+    func testFloating_widerThanMonitor_pinsToMonitorOrigin() async {
+        var window: Window!
+        Workspace.get(byName: name).floatingWindowsContainer.apply {
+            window = TestWindow.new(id: 1, parent: $0, rect: Rect(topLeftX: 100, topLeftY: 100, width: 200, height: 150))
+        }
+        _ = window.focusWindow()
+
+        // The test monitor is 1920x1080 wide; request a window wider than that.
+        await parseCommand("resize width 2000").cmdOrDie.run(.defaultEnv, .emptyStdin)
+        let rect = try! await window.getAxRect(.nonCancellable)!
+        assertEquals(rect.topLeftX, 0)
+    }
+
+    func testNoWindowFocused_fails() async {
+        let workspace = Workspace.get(byName: name)
+        let result = await parseCommand("resize width +2").cmdOrDie.run(.defaultEnv.withWorkspaceName(name), .emptyStdin)
+        assertEquals(result.exitCode.rawValue, 2)
+        assertEquals(result.stderr, [noWindowIsFocused])
+        assertTrue(workspace.isEffectivelyEmpty)
+    }
 }
