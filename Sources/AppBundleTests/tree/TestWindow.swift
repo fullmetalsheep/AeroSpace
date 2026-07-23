@@ -41,5 +41,16 @@ final class TestWindow: Window, CustomStringConvertible {
         _rect.map { CGSize(width: $0.width, height: $0.height) }
     }
 
+    // Mirrors MacApp.setFrame: nil topLeft/size means "leave that component unchanged"
+    override func setAxFrame(_ topLeft: CGPoint?, _ size: CGSize?) {
+        let base = _rect ?? Rect(topLeftX: 0, topLeftY: 0, width: 0, height: 0)
+        _rect = Rect(
+            topLeftX: topLeft?.x ?? base.topLeftX,
+            topLeftY: topLeft?.y ?? base.topLeftY,
+            width: size?.width ?? base.width,
+            height: size?.height ?? base.height,
+        )
+    }
+
     override func isMacosFullscreen(_ cm: CancellationMode) async throws -> Bool { isMacosFullscreenForTest }
 }

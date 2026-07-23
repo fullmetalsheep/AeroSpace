@@ -1,7 +1,7 @@
 import AppKit
 import Common
 
-struct Rect: ConvenienceMutable, AeroAny {
+struct Rect: ConvenienceMutable, AeroAny, Equatable {
     var topLeftX: CGFloat
     var topLeftY: CGFloat
 
@@ -62,4 +62,14 @@ extension Rect {
     var size: CGSize { CGSize(width: width, height: height) }
 
     func getDimension(_ orientation: Orientation) -> CGFloat { orientation == .h ? width : height }
+
+    /// Coerces `topLeft` so that a window of the given `size` positioned at the returned point stays fully
+    /// within `self`. If `size` exceeds `self` along an axis, the window is pinned to `self`'s origin on that axis
+    /// (mirrors the "best effort" clamping already used for cross-monitor floating window placement).
+    func coerceTopLeft(_ topLeft: CGPoint, forWindowSize size: CGSize) -> CGPoint {
+        CGPoint(
+            x: topLeft.x.coerce(in: minX ... max(minX, maxX - size.width)),
+            y: topLeft.y.coerce(in: minY ... max(minY, maxY - size.height)),
+        )
+    }
 }
