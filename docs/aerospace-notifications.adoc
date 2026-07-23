@@ -1,0 +1,41 @@
+= aerospace-notifications(1)
+include::util/man-attributes.adoc[]
+:manname: aerospace-notifications
+// tag::purpose[]
+:manpurpose: Enable or disable on-screen action notifications
+// end::purpose[]
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospace notifications [-h|--help] toggle
+aerospace notifications [-h|--help] on [--fail-if-noop]
+aerospace notifications [-h|--help] off [--fail-if-noop]
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+{manpurpose}
+
+Some actions (e.g. xref:aerospace-layout.adoc[`layout floating`/`layout tiling`] or
+xref:aerospace-center-floating-window.adoc[`center-floating-window`]) are otherwise completely silent,
+which is especially noticeable when they're triggered by a hotkey rather than the CLI (a hotkey has no
+terminal to print errors or results to). When notifications are enabled, a tiny "AppName : Action" toast
+briefly appears on screen instead.
+
+This setting is a runtime toggle, not a config option - it resets to enabled every time AeroSpace starts.
+
+// =========================================================== Options
+include::util/conditional-options-header.adoc[]
+
+-h, --help:: Print help
+--fail-if-noop:: Exit with non-zero exit code if already in the requested mode
+
+// end::body[]
+
+// =========================================================== Footer
+include::util/man-footer.adoc[]
