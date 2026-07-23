@@ -136,6 +136,11 @@ let move_help_generated = """
                 [--boundaries-action <boundary-action>] [--fail-if-fullscreen]
                 [--fail-if-macos-native-fullscreen] (left|down|up|right)
     """
+let notifications_help_generated = """
+    USAGE: notifications [-h|--help] toggle
+       OR: notifications [-h|--help] on [--fail-if-noop]
+       OR: notifications [-h|--help] off [--fail-if-noop]
+    """
 let reload_config_help_generated = """
     USAGE: reload-config [-h|--help] [--no-gui] [--dry-run] [--warnings-as-errors]
     """
