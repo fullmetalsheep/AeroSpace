@@ -70,6 +70,7 @@ struct LayoutCommand: Command {
                         } catch {
                             return .fail(io.err(bugPrompt()))
                         }
+                        showActionNotification(window, "Tiled")
                         return .succ
                 }
             case .floating:
@@ -77,6 +78,7 @@ struct LayoutCommand: Command {
                 let workspace = target.workspace
                 window.bindAsFloatingWindow(to: workspace)
                 if let size = window.lastFloatingSize { window.setAxFrame(nil, size) }
+                showActionNotification(window, "Floating")
                 return .succ
         }
     }

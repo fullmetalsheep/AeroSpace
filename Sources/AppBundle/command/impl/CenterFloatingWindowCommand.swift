@@ -24,6 +24,7 @@ struct CenterFloatingWindowCommand: Command {
             y: monitor.visibleRect.center.y - rect.height / 2,
         )
         setFloatingFrame(window, desiredTopLeft: desiredTopLeft, size: rect.size, on: monitor)
+        showActionNotification(window, "Centered")
         return .succ
     }
 }
