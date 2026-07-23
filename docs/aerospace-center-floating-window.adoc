@@ -1,0 +1,39 @@
+= aerospace-center-floating-window(1)
+include::util/man-attributes.adoc[]
+:manname: aerospace-center-floating-window
+// tag::purpose[]
+:manpurpose: Center the focused floating window on its monitor
+// end::purpose[]
+
+// =========================================================== Synopsis
+== Synopsis
+[verse]
+// tag::synopsis[]
+aerospace center-floating-window [-h|--help] [--window-id <window-id>]
+
+// end::synopsis[]
+
+// =========================================================== Description
+== Description
+
+// tag::body[]
+{manpurpose}
+
+The window's size is left untouched. The window is centered on whichever monitor it's currently
+displayed on (floating windows aren't bound to a monitor, see xref:guide.adoc#floating-windows[the guide]).
+
+Only floating windows are supported. Run xref:commands.adoc#layout[`layout floating`] first
+if the focused window is tiling.
+
+// =========================================================== Options
+include::./util/conditional-options-header.adoc[]
+
+-h, --help:: Print help
+
+--window-id <window-id>::
+include::./util/window-id-flag-desc.adoc[]
+
+// end::body[]
+
+// =========================================================== Footer
+include::util/man-footer.adoc[]
